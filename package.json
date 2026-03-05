@@ -1,0 +1,49 @@
+{
+  "name": "inventory-system",
+  "version": "4.20.69",
+  "description": "Supply Office Inventory Management System",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "inventory",
+    "medical",
+    "supply",
+    "management"
+  ],
+  "author": "Jeff C. Pais",
+  "license": "Something i guess",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.medicalsupply.inventory",
+    "productName": "Inventory System",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png",
+      "category": "Office"
+    }
+  }
+}

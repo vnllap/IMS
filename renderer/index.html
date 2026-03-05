@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Office Inventory System</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><span class="office-name">Supply Office</span> Inventory System</h1>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+        </header>
+
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalQuantity">0</div>
+                <div class="stat-label">Total Quantity</div>
+            </div>
+            <div class="stat-card stat-card-clickable" onclick="showStockModal('low')" title="Click to view low stock items">
+                <div class="stat-value" id="lowStock">0</div>
+                <div class="stat-label">Low Stock ↗</div>
+            </div>
+            <div class="stat-card stat-card-clickable" onclick="showStockModal('out')" title="Click to view out of stock items">
+                <div class="stat-value" id="outOfStock">0</div>
+                <div class="stat-label">Out of Stock ↗</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Add Item Form -->
+            <div class="card">
+                <h2>Add New Item</h2>
+                <form id="addItemForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="itemName">Item Name *</label>
+                            <input type="text" id="itemName" name="itemName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Personal Protective Equipment">Personal Protective Equipment</option>
+                                <option value="Medical Consumables">Medical Consumables</option>
+                                <option value="Medications">Medications</option>
+                                <option value="Medical Equipment">Medical Equipment</option>
+                                <option value="Laboratory Supplies">Laboratory Supplies</option>
+                                <option value="Office Supplies">Office Supplies</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-group-full">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" name="description" placeholder="Brief description of the item">
+                    </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity *</label>
+                            <input type="number" id="quantity" name="quantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="unit">Unit *</label>
+                            <select id="unit" name="unit" required>
+                                <option value="">Select Unit</option>
+                                <option value="Each">Piece/s</option>
+                                <option value="Box">Box/es</option>
+                                <option value="Pack">Pack/s</option>
+                                <option value="Bottle">Bottle/s</option>
+                                <option value="Vial">Vial/s</option>
+                                <option value="Roll">Roll/s</option>
+                                <option value="Bag">Bag/s</option>
+                                <option value="Set">Set/s</option>
+                                <option value="Gallon">Gallon/s</option>
+                                <option value="Tube">Tube/s</option>
+                                <option value="Unit">Unit/s</option>
+                                <option value="Sheet">Sheet/s</option>
+                                <option value="Pad">Pad/s</option>
+                                <option value="Cartridge">Cartridge/s</option>
+                                <option value="Jar">Jar/s</option>
+                                <option value="Rim">Ream/s</option>
+                                <option value="Cannister">Cannister/s</option>
+                                <option value="Can">Can/s</option>
+                                <option value="Pair">Pair/s</option>
+                                <option value="Ampule">Ampule/s</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="minQuantity">Reorder Point *</label>
+                            <input type="number" id="minQuantity" name="minQuantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" placeholder="e.g., Shelf A1">
+                        </div>
+                        <div class="form-group">
+                            <label for="sourceOfFunds">Source of Funds</label>
+                            <input type="text" id="sourceOfFunds" name="sourceOfFunds" placeholder="e.g., Budget allocation">
+                        </div>
+                        <div class="form-group">
+                            <label for="poNumber">P.O. No.</label>
+                            <input type="text" id="poNumber" name="poNumber" placeholder="----">
+                        </div>
+                        <div class="form-group">
+                            <label for="dateDelivered">Date Delivered</label>
+                            <input type="date" id="dateDelivered" name="dateDelivered">
+                        </div>
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date - For Perishables</label>
+                            <input type="date" id="expiryDate" name="expiryDate">
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn-success">Add Item</button>
+                        <button type="button" onclick="clearAddForm()">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Reduce Item Form -->
+            <div class="card">
+                <h2>Reduce Item Quantity</h2>
+                <form id="reduceItemForm">
+                    <div class="form-group">
+                        <label for="reduceItemSearch">Search/Select Item *</label>
+                        <input 
+                            type="text" 
+                            id="reduceItemSearch" 
+                            name="itemSearch" 
+                            placeholder="Type to search or click to see all items..."
+                            autocomplete="off"
+                            required
+                        >
+                        <div id="searchResults" class="search-results"></div>
+                        <input type="hidden" id="reduceItemId" name="itemId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reduceQuantity">Quantity to Reduce *</label>
+                        <input type="number" id="reduceQuantity" name="reduceQuantity" min="1" required>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="recipientSearch">Recipient/Department *</label>
+                            <input 
+                                type="text" 
+                                id="recipientSearch" 
+                                name="recipientSearch" 
+                                placeholder="Type to search or click to see all..."
+                                autocomplete="off"
+                            >
+                            <div id="recipientResults" class="search-results"></div>
+                            <input type="hidden" id="recipient" name="recipient" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="receivedBy">Received By (Optional)</label>
+                            <input type="text" id="receivedBy" name="receivedBy" placeholder="Name of person who took the item">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="purpose">Purpose </label>
+                        <input type="text" id="purpose" name="purpose" placeholder="e.g., Addt'l Office Supply">
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <input type="text" id="notes" name="notes" placeholder="Additional notes">
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">Transaction Date & Time <span style="font-weight:400; color:#64748b;">(defaults to now — change if logging a past release)</span></label>
+                        <input type="datetime-local" id="transactionDate" name="transactionDate">
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn-success" onclick="addToReduceList()">+ Add to List</button>
+                        <button type="button" onclick="clearReduceForm()">Clear Form</button>
+                    </div>
+                </form>
+
+                <!-- Reduction Review Panel -->
+                <div id="reduceReviewPanel" style="display:none; margin-top: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                        <h3 style="margin:0; font-size:15px; color:#2c3e50;">📋 Items Staged for Reduction</h3>
+                        <button class="btn-danger btn-sm" onclick="clearReduceList()" style="font-size:12px;">Clear List</button>
+                    </div>
+                    <div id="reduceListItems" style="border:1px solid #e2e8f0; border-radius:6px; overflow:hidden; margin-bottom:12px;"></div>
+                    <div style="background:#fff8e1; border:1px solid #ffe082; border-radius:6px; padding:10px 14px; font-size:13px; color:#7a5c00; margin-bottom:12px;">
+                        ⚠️ Review all items carefully before confirming. This action cannot be undone (unless you use Undo Last).
+                    </div>
+                    <div class="button-group" style="margin-top:0;">
+                        <button class="btn-warning" onclick="confirmReduceList()">✔ Confirm Reduction</button>
+                        <button onclick="clearReduceList()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="card">
+            <h2>Export & Backup</h2>
+            <p style="color: #64748b; margin-bottom: 15px;">
+                Export your inventory data in various formats or create a complete backup.
+            </p>
+            <div class="export-buttons">
+                <button onclick="exportToExcel()" class="btn-success">
+                Export to Excel (CSV)
+                </button>
+                <button onclick="exportToPDF()" class="btn-warning">
+                Export to PDF
+                </button>
+                <button onclick="exportToJSON()">
+                Export to JSON
+                </button>
+                <button onclick="backupAllData()" class="btn-success">
+                Create Full Backup
+                </button>
+                <button onclick="importBackup()" class="btn-danger">
+                Import Backup
+                </button>
+            </div>
+            <p style="color: #64748b; margin-top: 15px; font-size: 13px;">
+                <strong>Note:</strong> Your data is automatically saved to your browser's local storage and persists even after clearing browsing history (in most browsers).
+            </p>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="card">
+            <div class="section-header">
+                <h2>Recent Transactions (Last 20)</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-warning btn-sm" onclick="undoLastTransaction()" title="Undo the most recent transaction">↩ Undo Last</button>
+                    <button class="btn-danger btn-sm" onclick="clearTransactions()" title="Clear all transaction history">🗑 Clear All</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Item Name</th>
+                            <th>Quantity</th>
+                            <th>Recipient</th>
+                            <th>Purpose</th>
+                            <th>Notes</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px;">Loading transactions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Current Inventory -->
+        <div class="card">
+            <div class="section-header">
+                <h2>Current Inventory <span class="inv-count-badge" id="invCountBadge">0</span></h2>
+                <div class="inventory-search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        id="inventorySearch" 
+                        placeholder="Search by name, category, location..." 
+                        oninput="filterInventory(this.value)"
+                    >
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Description</th>
+                            <th>Source of Funds</th>
+                            <th>P.O. No.</th>
+                            <th>Date Delivered</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Min. Quantity</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                            <th>Date Added</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 30px;">Loading inventory...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="invPaginationControls" class="pagination-controls"></div>
+        </div>
+        <div class="card">
+            <h2>Simple Inventory Management System</h2>
+            <p style="color: #64748b; margin-bottom: 15px;">
+                Made by: Jeff C. Pais, BSCS 4, HSO Intern
+            </p>
+        </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div id="editModal" class="modal-overlay" onclick="closeEditModal(event)">
+        <div class="modal-box" style="max-width:620px; max-height:90vh;">
+            <div class="modal-header">
+                <h3>✏️ Edit Item</h3>
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding:20px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Item Name *</label>
+                        <input type="text" id="editItemName">
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="editCategory">
+                            <option value="Personal Protective Equipment">Personal Protective Equipment</option>
+                            <option value="Medical Consumables">Medical Consumables</option>
+                            <option value="Medications">Medications</option>
+                            <option value="Medical Equipment">Medical Equipment</option>
+                            <option value="Laboratory Supplies">Laboratory Supplies</option>
+                            <option value="Office Supplies">Office Supplies</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label>Description</label>
+                        <input type="text" id="editDescription">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" id="editQuantity" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit *</label>
+                        <select id="editUnit">
+                            <option value="Each">Piece/s</option>
+                            <option value="Box">Box/es</option>
+                            <option value="Pack">Pack/s</option>
+                            <option value="Bottle">Bottle/s</option>
+                            <option value="Vial">Vial/s</option>
+                            <option value="Roll">Roll/s</option>
+                            <option value="Bag">Bag/s</option>
+                            <option value="Set">Set/s</option>
+                            <option value="Gallon">Gallon/s</option>
+                            <option value="Tube">Tube/s</option>
+                            <option value="Unit">Unit/s</option>
+                            <option value="Sheet">Sheet/s</option>
+                            <option value="Pad">Pad/s</option>
+                            <option value="Cartridge">Cartridge/s</option>
+                            <option value="Jar">Jar/s</option>
+                            <option value="Rim">Rim/s</option>
+                            <option value="Cannister">Cannister/s</option>
+                            <option value="Can">Can/s</option>
+                            <option value="Pair">Pair/s</option>
+                            <option value="Ampule">Ampule/s</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Reorder Point *</label>
+                        <input type="number" id="editMinQuantity" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="editLocation">
+                    </div>
+                    <div class="form-group">
+                        <label>Source of Funds</label>
+                        <input type="text" id="editSourceOfFunds">
+                    </div>
+                    <div class="form-group">
+                        <label>P.O. No.</label>
+                        <input type="text" id="editPoNumber">
+                    </div>
+                    <div class="form-group">
+                        <label>Date Delivered</label>
+                        <input type="date" id="editDateDelivered">
+                    </div>
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="date" id="editExpiryDate">
+                    </div>
+                </div>
+                <div class="button-group" style="margin-top:16px;">
+                    <button class="btn-success" onclick="saveEditItem()">💾 Save Changes</button>
+                    <button onclick="closeEditModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Modal -->
+    <div id="stockModal" class="modal-overlay" onclick="closeStockModal(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" onclick="closeStockModal(event)">✕</button>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Item Details Modal -->
+    <div id="itemDetailsModal" class="modal-overlay" onclick="closeItemDetailsModal(event)">
+        <div class="modal-box" style="max-width:520px;">
+            <div class="modal-header" id="itemDetailsHeader">
+                <div>
+                    <h3 id="itemDetailsName" style="margin:0; font-size:17px;"></h3>
+                    <div id="itemDetailsBadge" style="margin-top:4px;"></div>
+                </div>
+                <button class="modal-close" onclick="closeItemDetailsModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding:0;">
+                <div id="itemDetailsContent"></div>
+                <div style="padding:14px 20px 16px; display:flex; gap:10px; border-top:1px solid #e2e8f0; background:#f8fafc;">
+                    <button class="btn-warning" style="flex:1;" id="detailsEditBtn" onclick="detailsToEdit()">&#9999;&#65039; Edit Item</button>
+                    <button onclick="closeItemDetailsModal()" style="flex:1; background:#e2e8f0; color:#334155;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
