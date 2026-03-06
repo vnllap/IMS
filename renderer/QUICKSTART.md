@@ -1,4 +1,4 @@
-# ðŸš€ QUICK START -Inventory System
+#QUICK START -Inventory System
 
 ## For Windows Users (Easiest Method)
 
